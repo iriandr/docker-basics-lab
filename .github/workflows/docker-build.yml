@@ -11,17 +11,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t hello-flask .
-
-      - name: Run container
-        run: docker run -d -p 5000:5000 --name test-container hello-flask
+      - name: Start services with docker compose
+        run: docker compose up -d --build
 
       - name: Wait for app to start
-        run: sleep 3
+        run: sleep 5
 
       - name: Check app responds
         run: curl --fail http://localhost:5000
 
-      - name: Stop container
-        run: docker stop test-container
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop services
+        run: docker compose down
